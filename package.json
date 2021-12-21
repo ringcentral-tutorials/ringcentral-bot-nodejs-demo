@@ -1,0 +1,33 @@
+{
+  "name": "ringcentral-bot-nodejs-demo",
+  "version": "0.1.0",
+  "description": "A sample app to build a RingCentral team messaging bot from scratch",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ringcentral-tutorials/ringcentral-bot-nodejs-demo.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ringcentral-tutorials/ringcentral-bot-nodejs-demo/issues"
+  },
+  "keywords": [
+    "ringcentral",
+    "conversational ui",
+    "team chat",
+    "team messaging",
+    "add in",
+    "adaptive card",
+    "onboarding",
+    "chatbot",
+    "bot"
+  ],
+  "dependencies": {
+    "@ringcentral/sdk": "^4.3.3",
+    "body-parser": ">1.18.2",
+    "dotenv": ">4.0.0",
+    "express": ">4.15.5"
+  }
+}

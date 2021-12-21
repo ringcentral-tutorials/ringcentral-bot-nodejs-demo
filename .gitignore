@@ -1,0 +1,9 @@
+# Created by .ignore
+node_modules/
+.DS_Store
+*/.DS_Store
+.env
+*~
+package-lock.json
+.bot-auth
+.bot-subscription
