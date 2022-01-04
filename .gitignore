@@ -5,5 +5,5 @@ node_modules/
 .env
 *~
 package-lock.json
-.bot-auth
-.bot-subscription
+.*bot-auth
+.*bot-subscription
