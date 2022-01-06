@@ -61,7 +61,7 @@ async function loadSavedTokens(){
   if (fs.existsSync( TOKEN_TEMP_FILE )) {
     accountTokens = JSON.parse( fs.readFileSync( TOKEN_TEMP_FILE ) );
     if (accountTokens.length){
-      console.log( "Load accounts' saved tokens")
+      console.log( "Load saved accounts' tokens")
       for (var account of accountTokens){
         var platform = rcsdk.platform()
         await platform.auth().setData( account.tokens );
@@ -79,8 +79,8 @@ the Bot menu and at the 'General Settings' section, click the 'Add to RingCentra
 
 // Handle authorization for public bots
 //
-// When a public bot is installed, RingCentral sends an authorization code to
-// th bot via an HTTP GET request through the specified redirect url. When the bot receives
+// When a public bot is installed, RingCentral sends an authorization code to the bot via
+// an HTTP GET request through the specified redirect url. When the bot receives
 // the authorization code, it must uses the code to exchange for an access token.
 
 // In this tutorial, we store the access tokens in a file so that we can reuse it
@@ -113,21 +113,21 @@ app.get('/oauth', async function (req, res) {
           var resp1 = await platform.get('/restapi/v1.0/account/~/extension/~')
           var jsonObj = await resp1.json()
 
-          // Bot access token is almost permanent. Thus, it does not have a refresh token. Before saving
-          // the access token for resusage, we assign fake refresh token values to satify the SDK's tokens syntax.
+          // Bot access token is almost permanent. Thus, there is no refresh token associated with the access token!
+          // However, before saving the access token for reuse, we assign fake refresh token values to satify
+          // the SDK's tokens syntax.
         	tokens['refresh_token'] = 'xxx';
         	tokens['refresh_token_expires_in'] = 10000000000;
 
-          // Make an account token object for reusage
+          // Make an account token object for reuse
           var accountTokenObj = {
             ownerId: tokens.owner_id, // Bot extension id
-            accountId: jsonObj.account.id,
-            subscriptionId: '',
-            tokens: tokens
+            accountId: jsonObj.account.id, // User account id
+            tokens: tokens,
+            subscriptionId: ''
           }
           // Add this new token object to our accountTokens array
           accountTokens.push(accountTokenObj)
-          console.log(accountTokens)
           res.status(200).send("")
           console.log("Subscribe to Webhooks notification")
           // The bot must subscribe for Team Messaging notifications so that it can receive messages
@@ -157,7 +157,7 @@ app.post('/webhook-callback', async function (req, res) {
          renewSubscription( platform, req.body.subscriptionId);
       }
     } else if (req.body.body.eventType == "PostAdded") {
-      // get account tokens
+      // get the account's token object
       var account = accountTokens.find(o => o.ownerId == req.body.ownerId)
       if (account){
         var platform = rcsdk.platform()
@@ -168,6 +168,9 @@ app.post('/webhook-callback', async function (req, res) {
           console.log("Ignoring message posted by bot.");
         } else if (req.body.body.text == "ping") {
           send_message( platform, req.body.body.groupId, "pong" )
+        // Add more bot commands here by training your bot to respond to different keywords
+        //} else if (req.body.body.text == "some keyword") {
+          // send_message( body.groupId, "reply message" )          
         } else if (req.body.body.text == "hello") {
           var card = make_hello_world_card(null)
           send_card( platform, req.body.body.groupId, card )
@@ -178,24 +181,15 @@ app.post('/webhook-callback', async function (req, res) {
       }
     } else if (req.body.body.eventType == 'Delete'){
       console.log('Bot is being uninstalled by a user => clean up resources')
-      // Bot is being uninstalled by a user => clean up resouce
-      // get account tokens
+      // Bot is being uninstalled by a customer => clean up resouce
       var index = accountTokens.findIndex(c => c.ownerId === req.body.ownerId)
       if (index >= 0 ){
+        // get the account's token object
         var account = accountTokens[index]
-        var platform = rcsdk.platform()
-        try {
-          await platform.auth().setData(account.tokens)
-          // delete subscription
-          console.log("Delete account's subscription")
-          await platform.delete(`/restapi/v1.0/subscription/${req.body.subscriptionId}`)
-        } catch (e){
-          console.log(e.message)
-        }
-        // clear local database
+        // remove this account from the accountTokens list and update local file/database
         accountTokens.splice(index, 1)
         fs.writeFileSync( TOKEN_TEMP_FILE, JSON.stringify( accountTokens ) )
-        console.log("Remove saved token of this customer account")
+        console.log("Removed saved token of this customer account")
       }
     } else {
       console.log("Event type:", req.body.body.eventType)
@@ -269,10 +263,9 @@ async function checkWebhooksSubscription(p, account) {
 // This handler is called when a user submit data from an adaptive card
 app.post('/user-submit', async function (req, res) {
     console.log( "Received card event." )
-    res.statusCode = 200;
-    res.end();
-    console.log(req.body)
+    res.status(200).end()
     var body = req.body
+    // get the account's token object
     var account = accountTokens.find(o => o.accountId == body.user.accountId)
     if (account){
       console.log("Customer account found", account.accountId)
