@@ -34,14 +34,14 @@ app.use( bp.urlencoded({
 
 // Start our server
 app.listen(PORT, function () {
-    console.log("Bot server listening on port " + PORT);
-    loadSavedTokens()
+  console.log("Bot server listening on port " + PORT);
+  loadSavedTokens()
 });
 
 // This route handles GET requests to our root ngrok address and responds
 // with the same "Ngrok is working message"
 app.get('/', function(req, res) {
-    res.send('Ngrok is working! Path Hit: ' + req.url);
+  res.send('Ngrok is working! Path Hit: ' + req.url);
 });
 
 // Instantiate the RingCentral JavaScript SDK
@@ -65,11 +65,11 @@ async function loadSavedTokens(){
       var subscriptionId = fs.readFileSync(SUBSCRIPTION_ID_TEMP_FILE)
       checkWebhooksSubscription(subscriptionId)
     }else
-      subscribeToEvents()
+    subscribeToEvents()
   }else{
     console.log("Your bot has not been installed or the saved access token was lost!")
     console.log("Login to developers.ringcentral.com, open the bot app and install it by selecting \
-the Bot menu and at the 'General Settings' section, click the 'Add to RingCentral' button.")
+    the Bot menu and at the 'General Settings' section, click the 'Add to RingCentral' button.")
     console.log("Note: If the bot was installed, remove it and reinstall to get a new access token")
   }
 }
@@ -116,9 +116,8 @@ app.post('/oauth', async function (req, res) {
     // The bot must subscribe for Team Messaging notifications so that it can receive messages
     // and other important event notifications from bot users and from RingCentral server.
     // Cause a second delay to make sure the access token is fully populated
-    //setTimeout(function(){
-      subscribeToEvents()
-    //}, 1000)
+    console.log("Subscribe to Webhooks notification")
+    subscribeToEvents()
   }else{
     res.status(401).end()
   }
@@ -143,9 +142,9 @@ app.post('/webhook-callback', async function (req, res) {
       console.log("Ignoring message posted by bot.");
     } else if (body.text == "ping") {
       send_message( body.groupId, "pong" )
-    // Add more bot commands here by training your bot to respond to different keywords
-    //} else if (req.body.body.text == "some keyword") {
-      // send_message( body.groupId, "reply message" )      
+      // Add more bot commands here by training your bot to respond to different keywords
+      //} else if (req.body.body.text == "some keyword") {
+      // send_message( body.groupId, "reply message" )
     } else if (body.text == "hello") {
       var card = make_hello_world_card(null)
       send_card( body.groupId, card )
@@ -230,126 +229,126 @@ async function checkWebhooksSubscription(subscriptionId) {
 
 // This handler is called when a user submit data from an adaptive card
 app.post('/user-submit', function (req, res) {
-    console.log( "Received card event." )
-    var body = req.body
-    if (body.data.path == 'new-card'){
-      var card = make_new_name_card( body.data.hellotext )
-      send_card( body.conversation.id, card)
-    }else if (body.data.path == 'update-card'){
-      var card = make_hello_world_card( body.data.hellotext )
-      update_card( body.card.id, card )
-    }
-    res.status(200).end();
+  console.log( "Received card event." )
+  var body = req.body
+  if (body.data.path == 'new-card'){
+    var card = make_new_name_card( body.data.hellotext )
+    send_card( body.conversation.id, card)
+  }else if (body.data.path == 'update-card'){
+    var card = make_hello_world_card( body.data.hellotext )
+    update_card( body.card.id, card )
+  }
+  res.status(200).end();
 });
 
 // Post a message to a chat
 async function send_message( groupId, message ) {
-    console.log("Posting response to group: " + groupId);
-    try {
-      await platform.post(`/restapi/v1.0/glip/chats/${groupId}/posts`, {
-  	     "text": message
-       })
-    }catch(e) {
-	    console.log(e)
-    }
+  console.log("Posting response to group: " + groupId);
+  try {
+    await platform.post(`/restapi/v1.0/glip/chats/${groupId}/posts`, {
+      "text": message
+    })
+  }catch(e) {
+    console.log(e)
+  }
 }
 
 // Send an adaptive card to a chat
 async function send_card( groupId, card ) {
-    console.log("Posting a card to group: " + groupId);
-    try {
-      var resp = await platform.post(`/restapi/v1.0/glip/chats/${groupId}/adaptive-cards`, card)
-	  }catch (e) {
-	    console.log(e)
-	  }
+  console.log("Posting a card to group: " + groupId);
+  try {
+    var resp = await platform.post(`/restapi/v1.0/glip/chats/${groupId}/adaptive-cards`, card)
+  }catch (e) {
+    console.log(e)
+  }
 }
 
 // Update an adaptive card
 async function update_card( cardId, card ) {
-    console.log("Updating card...");
-    try {
-      var resp = await platform.put(`/restapi/v1.0/glip/adaptive-cards/${cardId}`, card)
-    }catch (e) {
-	    console.log(e.message)
-	  }
+  console.log("Updating card...");
+  try {
+    var resp = await platform.put(`/restapi/v1.0/glip/adaptive-cards/${cardId}`, card)
+  }catch (e) {
+    console.log(e.message)
+  }
 }
 
 function make_hello_world_card(name) {
-    var card = {
-    	type: "AdaptiveCard",
-    	$schema: "http://adaptivecards.io/schemas/adaptive-card.json",
-    	version: "1.3",
-    	body: [
-        {
-      		type: "TextBlock",
-      		size: "Medium",
-      	  weight: "Bolder",
-      		text: "Hello World"
-        },
-        {
-      		type: "TextBlock",
-      		text: "Enter your name in the field below so that I can say hello.",
-      		wrap: true
-        },
-        {
-      		type: "Input.Text",
-      		id: "hellotext",
-      		placeholder: "Enter your name"
-        },
-        {
-          type: "ActionSet",
-          actions: [
-            {
-              type: "Action.Submit",
-              title: "Send a new card",
-              data: {
-                path: "new-card"
-              }
-            },
-            {
-              type: "Action.Submit",
-              title: "Update this card",
-              data: {
-                path: "update-card"
-              }
+  var card = {
+    type: "AdaptiveCard",
+    $schema: "http://adaptivecards.io/schemas/adaptive-card.json",
+    version: "1.3",
+    body: [
+      {
+        type: "TextBlock",
+        size: "Medium",
+        weight: "Bolder",
+        text: "Hello World"
+      },
+      {
+        type: "TextBlock",
+        text: "Enter your name in the field below so that I can say hello.",
+        wrap: true
+      },
+      {
+        type: "Input.Text",
+        id: "hellotext",
+        placeholder: "Enter your name"
+      },
+      {
+        type: "ActionSet",
+        actions: [
+          {
+            type: "Action.Submit",
+            title: "Send a new card",
+            data: {
+              path: "new-card"
             }
-          ]
+          },
+          {
+            type: "Action.Submit",
+            title: "Update this card",
+            data: {
+              path: "update-card"
+            }
+          }
+        ]
+      }
+    ]
+  }
+  if (name){
+    card.body.push({
+      type: "Container",
+      separator: true,
+      items: [
+        {
+          type: "TextBlock",
+          text: `Hello ${name}`,
+          wrap: true
         }
       ]
-    }
-    if (name){
-      card.body.push({
-          type: "Container",
-          separator: true,
-          items: [
-            {
-              type: "TextBlock",
-            	text: `Hello ${name}`,
-            	wrap: true
-            }
-          ]
-        })
-    }
-    return card
+    })
+  }
+  return card
 }
 
 function make_new_name_card(name) {
-    return {
-    	"type": "AdaptiveCard",
-    	"$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
-    	"version": "1.3",
-    	"body": [
-        {
-      		"type": "TextBlock",
-      		"size": "Medium",
-      		"weight": "Bolder",
-      		"text": "Hello World"
-        },
-        {
-      		"type": "TextBlock",
-      		"text": `Hello ${name}`,
-      		"wrap": true
-        }
-    	]
-    }
+  return {
+    "type": "AdaptiveCard",
+    "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+    "version": "1.3",
+    "body": [
+      {
+        "type": "TextBlock",
+        "size": "Medium",
+        "weight": "Bolder",
+        "text": "Hello World"
+      },
+      {
+        "type": "TextBlock",
+        "text": `Hello ${name}`,
+        "wrap": true
+      }
+    ]
+  }
 }
