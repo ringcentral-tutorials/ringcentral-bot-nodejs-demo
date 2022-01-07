@@ -4,7 +4,9 @@
   "description": "A sample app to build a RingCentral team messaging bot from scratch",
   "main": "private-bot.js",
   "scripts": {
-    "start": "node private-bot.js"
+    "start": "node private-bot.js",
+    "start-private": "node private-bot.js",
+    "start-public": "node public-bot.js"
   },
   "repository": {
     "type": "git",
