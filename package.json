@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node private-bot.js",
     "start-private": "node private-bot.js",
-    "start-public": "node public-bot.js",
+    "start-public": "node public-bot.js"
   },
   "repository": {
     "type": "git",
