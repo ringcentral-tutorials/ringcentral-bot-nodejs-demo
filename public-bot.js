@@ -206,7 +206,7 @@ async function subscribeToEvents(p, accountTokenObj){
     "eventFilters": [
       "/restapi/v1.0/glip/posts", // Team Messaging (a.k.a Glip) Events.
       "/restapi/v1.0/glip/groups", // Team Messaging (a.k.a Glip) Events.
-      "/restapi/v1.0/account/~/extension/~", // Subscribe for this event to detect when a bot is uninstalled
+      "/restapi/v1.0/account/~/extension/~", // Subscribe for this event to detect when a bot is installed and uninstalled
       "/restapi/v1.0/subscription/~?threshold=60&interval=15" // For subscription renewal
     ],
     "deliveryMode": {
@@ -261,7 +261,7 @@ async function checkWebhooksSubscription(p, account) {
   }
 }
 
-// This handler is called when a user submit data from an adaptive card
+// This handler is called when a user submits data from an adaptive card
 app.post('/user-submit', async function (req, res) {
   console.log( "Received card event." )
   res.status(200).end()

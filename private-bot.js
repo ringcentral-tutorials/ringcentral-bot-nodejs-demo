@@ -65,7 +65,7 @@ async function loadSavedTokens(){
       var subscriptionId = fs.readFileSync(SUBSCRIPTION_ID_TEMP_FILE)
       checkWebhooksSubscription(subscriptionId)
     }else
-    subscribeToEvents()
+      subscribeToEvents()
   }else{
     console.log("Your bot has not been installed or the saved access token was lost!")
     console.log("Login to developers.ringcentral.com, open the bot app and install it by selecting \
@@ -172,7 +172,7 @@ async function subscribeToEvents(){
     eventFilters: [
       "/restapi/v1.0/glip/posts", // Team Messaging (a.k.a Glip) events.
       "/restapi/v1.0/glip/groups", // Team Messaging (a.k.a Glip) events.
-      "/restapi/v1.0/account/~/extension/~", // Subscribe for this event to detect when a bot is uninstalled
+      "/restapi/v1.0/account/~/extension/~", // Subscribe for this event to detect when a bot is installed and uninstalled
       "/restapi/v1.0/subscription/~?threshold=60&interval=15" // For subscription renewal
     ],
     deliveryMode: {
@@ -227,7 +227,7 @@ async function checkWebhooksSubscription(subscriptionId) {
   }
 }
 
-// This handler is called when a user submit data from an adaptive card
+// This handler is called when a user submits data from an adaptive card
 app.post('/user-submit', function (req, res) {
   console.log( "Received card event." )
   var body = req.body
