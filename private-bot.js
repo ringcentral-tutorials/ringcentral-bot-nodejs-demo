@@ -131,6 +131,7 @@ app.post('/webhook-callback', async function (req, res) {
   if (validationToken) {
     console.log('Verifying webhook token.');
     res.setHeader('Validation-Token', validationToken);
+    res.setHeader('Content-Type',"application/json");
   } else if (req.body.event == "/restapi/v1.0/subscription/~?threshold=60&interval=15") {
     console.log("Renewing subscription ID: " + req.body.subscriptionId);
     renewSubscription(req.body.subscriptionId);
