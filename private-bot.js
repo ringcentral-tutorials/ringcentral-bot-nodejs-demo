@@ -16,8 +16,8 @@ var fs      = require('fs');
 
 // read in config parameters from environment, or .env file
 const PORT            = process.env.PORT;
-const RINGCENTRAL_CLIENT_ID       = process.env.RINGCENTRAL_CLIENT_ID_PRIVATE;
-const RINGCENTRAL_CLIENT_SECRET   = process.env.RINGCENTRAL_CLIENT_SECRET_PRIVATE;
+const RINGCENTRAL_CLIENT_ID       = process.env.RINGCENTRAL_CLIENT_ID;
+const RINGCENTRAL_CLIENT_SECRET   = process.env.RINGCENTRAL_CLIENT_SECRET;
 const RINGCENTRAL_SERVER_URL = process.env.RINGCENTRAL_SERVER_URL;
 const RINGCENTRAL_OAUTH_REDIRECT_URI = process.env.RINGCENTRAL_OAUTH_REDIRECT_URI
 const WEBHOOKS_DELIVERY_ADDRESS = process.env.WEBHOOKS_DELIVERY_ADDRESS
